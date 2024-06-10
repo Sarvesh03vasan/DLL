@@ -1,0 +1,32 @@
+#classifying Mnist dataset using CNN
+
+import tensorflow as tf
+from tensorflow.keras import datasets, layers
+import matplotlib.pyplot as plt
+(train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data()
+
+model = tf.keras.Sequential([
+    layers.Lambda(lambda x: tf.expand_dims(x, axis=-1)),
+    layers.Conv2D(32, 3, activation="relu"),
+    layers.MaxPool2D(),
+    layers.Conv2D(32, 3, activation="relu"),
+    layers.Flatten(),
+    layers.Dense(10, activation="softmax")
+])
+
+model.compile(loss="sparse_categorical_crossentropy",
+              optimizer=tf.keras.optimizers.Adam(),
+              metrics=["accuracy"])
+history = model.fit(x=tf.cast(train_images, tf.float32),
+          y=train_labels,
+          epochs=10,
+          validation_data=(tf.cast(test_images, tf.float32), test_labels))
+plt.plot(history.history['loss'], label = "Training Loss")
+plt.plot(history.history['val_loss'], label = "Validation Loss")
+plt.plot(history.history['accuracy'], label = "Training Accuracy")
+plt.plot(history.history['val_accuracy'], label = "Validation Accuracy")
+plt.title("Training and validation curve")
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.legend()
+plt.show()
